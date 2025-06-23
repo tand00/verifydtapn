@@ -107,7 +107,7 @@ void ProbabilityEstimation::printViolatingRunsStats() {
     }
 }
 
-void ProbabilityEstimation::printRunsStats(const std::string category, unsigned long n, unsigned long totalSteps, double totalDelay, std::vector<int> perStep, std::vector<float> perDelay) {
+void ProbabilityEstimation::printRunsStats(const std::string category, uint64_t n, uint64_t totalSteps, double totalDelay, std::vector<uint64_t> perStep, std::vector<float> perDelay) {
     if(n == 0) {
         std::cout << "  no " + category + " runs, unable to compute specific statistics" << std::endl;
         return;
