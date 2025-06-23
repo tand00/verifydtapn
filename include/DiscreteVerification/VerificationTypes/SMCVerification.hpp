@@ -71,9 +71,9 @@ class SMCVerification : public Verification<RealMarking> {
         SMCRunGenerator runGenerator;
         SMCSettings smcSettings;
         size_t numberOfRuns;
-        unsigned int maxTokensSeen;
+        uint64_t maxTokensSeen;
         double totalTime = 0;
-        unsigned long totalSteps = 0;
+        uint64_t totalSteps = 0;
         int64_t durationNs = 0;
 
         std::mutex run_res_mutex;
