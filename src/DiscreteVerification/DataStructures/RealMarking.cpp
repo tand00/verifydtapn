@@ -75,7 +75,7 @@ RealTokenList& RealMarking::getTokenList(int placeId)
     return places[placeId].tokens;
 }
 
-void RealMarking::deltaAge(double x)
+void RealMarking::deltaAge(clockValue x)
 {
     for(auto& place : places) {
         place.deltaAge(x);
@@ -104,7 +104,7 @@ bool RealMarking::canDeadlock(const TAPN::TimedArcPetriNet &tapn, int maxDelay, 
     return deadlocked;
 }
 
-bool RealMarking::removeToken(int placeId, double age)
+bool RealMarking::removeToken(int placeId, clockValue age)
 {
     RealToken token(age, 1);
     return removeToken(placeId, token);
@@ -120,7 +120,7 @@ bool RealMarking::removeToken(RealPlace &place, RealToken &token)
     return place.remove(token);
 }
 
-void RealMarking::addTokenInPlace(TAPN::TimedPlace &place, double age)
+void RealMarking::addTokenInPlace(TAPN::TimedPlace &place, clockValue age)
 {
     RealToken token(age, 1);
     addTokenInPlace(place, token);
@@ -136,12 +136,12 @@ void RealMarking::addTokenInPlace(const TAPN::TimedPlace &place, RealToken &toke
     places[place.getIndex()].add(token);
 }
 
-double RealMarking::availableDelay() const
+clockValue RealMarking::availableDelay() const
 {
-    double available = std::numeric_limits<double>::infinity();
+    clockValue available = std::numeric_limits<clockValue>::max();
     for(const auto& place : places) {
         if(place.isEmpty()) continue;
-        double delay = place.availableDelay();
+        clockValue delay = place.availableDelay();
         if(delay < available) {
             available = delay;
         }
