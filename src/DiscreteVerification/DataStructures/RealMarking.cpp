@@ -154,7 +154,7 @@ void RealMarking::setDeadlocked(const bool dead)
     deadlocked = dead;
 }
 
-bool RealMarking::enables(TAPN::TimedTransition* transition) {
+bool RealMarking::enables(TAPN::TimedTransition* transition, const uint32_t precision) {
     for(auto input : transition->getInhibitorArcs()) {
         uint32_t weight = input->getWeight();
         RealTokenList tokens = getTokenList(input->getInputPlace().getIndex());
@@ -170,10 +170,13 @@ bool RealMarking::enables(TAPN::TimedTransition* transition) {
     }
     for(auto input : transition->getPreset()) {
         TAPN::TimeInterval interval = input->getInterval();
+        clockValue lower = toClock(interval.getLowerBound(), precision);
+        clockValue upper = toClock(interval.getUpperBound(), precision);
         uint32_t weight = input->getWeight();
         RealTokenList tokens = getTokenList(input->getInputPlace().getIndex());
         for(auto& token : tokens) {
-            if(interval.contains(token.getAge())) {
+            clockValue age = token.getAge();
+            if(lower <= age && upper >= age) {
                 if(token.getCount() > weight) {
                     weight = 0;
                 } else {
@@ -189,10 +192,13 @@ bool RealMarking::enables(TAPN::TimedTransition* transition) {
         TAPN::TimeInterval interval = input->getInterval();
         if(outputPlace.getInvariant().getBound() < interval.getUpperBound())
             interval.setUpperBound(outputPlace.getInvariant().getBound(), false);
+        clockValue lower = toClock(interval.getLowerBound(), precision);
+        clockValue upper = toClock(interval.getUpperBound(), precision);
         uint32_t weight = input->getWeight();
         RealTokenList tokens = getTokenList(input->getSource().getIndex());
         for(auto& token : tokens) {
-            if(interval.contains(token.getAge())) {
+            clockValue age = token.getAge();
+            if(lower <= age && upper >= age) {
                 if(token.getCount() > weight) {
                     weight = 0;
                 } else {

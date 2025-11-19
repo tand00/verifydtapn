@@ -15,7 +15,7 @@
 namespace VerifyTAPN {
     namespace DiscreteVerification {
 
-        using Util::interval;
+        using namespace Util;
 
         void SMCRunGenerator::prepare(RealMarking *parent) {
             _origin = new RealMarking(*parent);
@@ -271,7 +271,9 @@ namespace VerifyTAPN {
 
         std::vector<interval<clockValue>> SMCRunGenerator::arcFiringDates(TimeInterval time_interval, uint32_t weight, RealTokenList& tokens) {
             // We assume tokens is SORTED !
-            Util::interval<clockValue> arcInterval(time_interval.getLowerBound(), time_interval.getUpperBound());
+            clockValue lower = toClock(time_interval.getLowerBound(), _numericPrecision);
+            clockValue upper = toClock(time_interval.getUpperBound(), _numericPrecision);
+            Util::interval<clockValue> arcInterval(lower, upper);
             size_t total_tokens = 0;
             for(auto &t : tokens) {
                 total_tokens += t.getCount();
@@ -305,10 +307,13 @@ namespace VerifyTAPN {
             std::uniform_int_distribution<> randomTokenIndex(0, tokenList.size() - 1);
             size_t tok_index = randomTokenIndex(_rng);
             size_t tested = 0;
+            clockValue lower = toClock(interval.getLowerBound(), _numericPrecision);
+            clockValue upper = toClock(interval.getUpperBound(), _numericPrecision);
             while(remaining > 0 && tested < tokenList.size()) {
                 RealToken& token = tokenList[tok_index];
-                if(interval.contains(token.getAge())) {
-                    res.push_back(RealToken(token.getAge(), 1));
+                clockValue age = token.getAge();
+                if(lower <= age && upper >= age) {
+                    res.push_back(RealToken(age, 1));
                     remaining--;
                     tokenList[tok_index].remove(1);
                     if(tokenList[tok_index].getCount() == 0) {
@@ -332,9 +337,11 @@ namespace VerifyTAPN {
             std::vector<RealToken> res;
             int remaining = weight;
             auto iter = tokenList.begin();
+            clockValue lower = toClock(interval.getLowerBound(), _numericPrecision);
+            clockValue upper = toClock(interval.getUpperBound(), _numericPrecision);
             while(iter != tokenList.end()) {
                 clockValue age = iter->getAge();
-                if(!interval.contains(age)) {
+                if(lower > age || upper < age) {
                     iter++;
                     continue;
                 }
@@ -359,9 +366,11 @@ namespace VerifyTAPN {
             std::vector<RealToken> res;
             int remaining = weight;
             auto iter = tokenList.rbegin();
+            clockValue lower = toClock(interval.getLowerBound(), _numericPrecision);
+            clockValue upper = toClock(interval.getUpperBound(), _numericPrecision);
             while(iter != tokenList.rend()) {
                 clockValue age = iter->getAge();
-                if(!interval.contains(age)) {
+                if(lower > age || upper < age) {
                     iter++;
                     continue;
                 }

@@ -102,7 +102,7 @@ namespace VerifyTAPN {
             clockValue _totalTime = 0;
             int _totalSteps = 0;
 
-            unsigned int _numericPrecision = 0;
+            uint32_t _numericPrecision = 0;
 
             std::ranlux48 _rng;
 

@@ -106,9 +106,10 @@ namespace VerifyTAPN::DiscreteVerification {
 
             bool remove(RealToken to_remove);
 
-            clockValue availableDelay() const {
+            clockValue availableDelay(const uint32_t precision = 0) const {
                 if(tokens.size() == 0) return std::numeric_limits<clockValue>::max();
-                clockValue delay = place->getInvariant().getBound() - maxTokenAge();
+                clockValue delay = 
+                    toClock(place->getInvariant().getBound(), precision) - maxTokenAge();
                 return delay <= 0 ? 0 : delay;
             }
 
@@ -174,7 +175,7 @@ namespace VerifyTAPN::DiscreteVerification {
 
             inline void setPreviousDelay(const clockValue delay) { this->fromDelay = delay; }
 
-            bool enables(TAPN::TimedTransition* transition);
+            bool enables(TAPN::TimedTransition* transition, const uint32_t precision = 0);
 
             unsigned int _thread_id = 0;
 
