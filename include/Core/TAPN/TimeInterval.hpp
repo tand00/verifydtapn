@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <map>
 #include <cassert>
+#include <cstdint>
 
 namespace VerifyTAPN { namespace TAPN {
 
@@ -14,7 +15,7 @@ namespace VerifyTAPN { namespace TAPN {
         TimeInterval() : leftStrict(false), lowerBound(0), upperBound(std::numeric_limits<int>::max()),
                          rightStrict(true) {};
 
-        TimeInterval(bool leftStrict, uint64_t lowerBound, uint64_t upperBound, bool rightStrict) : leftStrict(leftStrict),
+        TimeInterval(bool leftStrict, int lowerBound, int upperBound, bool rightStrict) : leftStrict(leftStrict),
                                                                                           lowerBound(lowerBound),
                                                                                           upperBound(upperBound),
                                                                                           rightStrict(
@@ -26,21 +27,21 @@ namespace VerifyTAPN { namespace TAPN {
 
         virtual ~TimeInterval() { /* empty */ }
 
-        void divideBoundsBy(uint64_t divider);
+        void divideBoundsBy(int divider);
 
 
     public: // inspectors
         void print(std::ostream &out) const;
 
-        inline uint64_t getLowerBound() const { return lowerBound; }
+        inline int getLowerBound() const { return lowerBound; }
 
-        inline uint64_t getUpperBound() const { return upperBound; }
+        inline int getUpperBound() const { return upperBound; }
 
         inline bool isLowerBoundStrict() const { return leftStrict; }
 
         inline bool isUpperBoundStrict() const { return rightStrict; }
 
-        inline bool setUpperBound(uint64_t bound, bool isStrict) {
+        inline bool setUpperBound(int bound, bool isStrict) {
             if (upperBound == bound) rightStrict |= isStrict;
             else if (upperBound > bound) {
                 rightStrict = isStrict;
@@ -55,10 +56,6 @@ namespace VerifyTAPN { namespace TAPN {
         }
 
         inline bool contains(int number) const {
-            return number >= lowerBound && number <= upperBound;
-        }
-
-        inline bool contains(uint64_t number) const {
             return number >= lowerBound && number <= upperBound;
         }
 
@@ -89,8 +86,8 @@ namespace VerifyTAPN { namespace TAPN {
 
     private: // data
         bool leftStrict;
-        uint64_t lowerBound;
-        uint64_t upperBound;
+        int lowerBound;
+        int upperBound;
         bool rightStrict;
     };
 

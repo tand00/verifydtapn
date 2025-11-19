@@ -27,15 +27,17 @@ bool SMCVerification::parallel_run() {
     std::cout << ". Using " << n_threads << " threads..." << std::endl;
     initWatchs(n_threads);
 
+    clockValue timeBound = toClock(smcSettings.timeBound, options.getSMCNumericPrecision());
+
     std::vector<std::thread*> handles;
     for(int i = 0 ; i < n_threads ; i++) {
-        auto handle = new std::thread([this, i]() {
+        auto handle = new std::thread([this, i, timeBound]() {
             SMCRunGenerator generator = runGenerator.copy();
             generator._thread_id = i;
             bool continueExecution = true;
             while(continueExecution) {
                 bool runRes = executeRun(&generator);
-                double runDuration = std::min(generator.getRunDelay(), (double) smcSettings.timeBound);
+                double runDuration = std::min(generator.getRunDelay(), timeBound);
                 int runSteps = std::min(generator.getRunSteps(), smcSettings.stepBound);
                 {
                     std::lock_guard<std::mutex> lock(run_res_mutex);
@@ -73,9 +75,10 @@ bool SMCVerification::run() {
     auto start = std::chrono::steady_clock::now();
     auto step1 = std::chrono::steady_clock::now();
     int64_t stepDuration;
+    clockValue timeBound = toClock(smcSettings.timeBound, options.getSMCNumericPrecision());
     while(mustDoAnotherRun()) {
         bool runRes = executeRun();
-        double runDuration = std::min(runGenerator.getRunDelay(), (double) smcSettings.timeBound);
+        double runDuration = std::min(runGenerator.getRunDelay(), timeBound);
         int runSteps = std::min(runGenerator.getRunSteps(), smcSettings.stepBound);
         handleRunResult(runRes, runSteps, runDuration);
         if(mustSaveTrace()) handleTrace(runRes);
@@ -104,7 +107,8 @@ bool SMCVerification::executeRun(SMCRunGenerator* generator) {
     bool runRes = false;
     if(generator == nullptr) generator = &runGenerator;
     RealMarking* newMarking = generator->getMarking();
-    while(!generator->reachedEnd() && !reachedRunBound(generator)) {
+    clockValue timeBound = toClock(smcSettings.timeBound, options.getSMCNumericPrecision());
+    while(!generator->reachedEnd() && !reachedRunBound(timeBound, smcSettings.stepBound, generator)) {
         RealMarking* child = new RealMarking(*newMarking);
         child->_thread_id = generator->_thread_id;
         child->setGeneratedBy(newMarking->getGeneratedBy());
@@ -140,11 +144,11 @@ void SMCVerification::setMaxTokensIfGreater(unsigned int i) {
     }
 }
 
-bool SMCVerification::reachedRunBound(SMCRunGenerator* generator) {
+bool SMCVerification::reachedRunBound(clockValue timeBound, int stepBound, SMCRunGenerator* generator) {
     if(generator == nullptr) generator = &runGenerator;
     return 
-        generator->getRunDelay() > smcSettings.timeBound ||
-        generator->getRunSteps() > smcSettings.stepBound;
+        generator->getRunDelay() > timeBound ||
+        generator->getRunSteps() > stepBound;
 }
 
 void SMCVerification::handleTrace(const bool runRes, SMCRunGenerator* generator) {
