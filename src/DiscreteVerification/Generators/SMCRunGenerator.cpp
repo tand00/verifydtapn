@@ -51,7 +51,7 @@ namespace VerifyTAPN {
             _maximal = false;
             _totalTime = 0;
             _totalSteps = 0;
-            _dates_sampled = std::vector<clockValue>(_transitionIntervals.size(), std::numeric_limits<clockValue>::infinity());
+            _dates_sampled = std::vector<clockValue>(_transitionIntervals.size(), std::numeric_limits<clockValue>::max());
             bool deadlocked = true;
             for(int i = 0 ; i < _dates_sampled.size() ; i++) {
                 auto* intervals = &_transitionIntervals[i];
@@ -165,7 +165,7 @@ namespace VerifyTAPN {
             for(int i = 0 ; i < _transitionIntervals.size() ; i++) {
                 clockValue date = _dates_sampled[i];
                 _dates_sampled[i] = (date == std::numeric_limits<clockValue>::max()) ?
-                    std::numeric_limits<clockValue>::infinity() : date - delay;
+                    std::numeric_limits<clockValue>::max() : date - delay;
             }
 
             refreshTransitionsIntervals();
@@ -447,7 +447,7 @@ namespace VerifyTAPN {
 
             for (auto* output : transi->getPostset()) {
                 TimedPlace &place = output->getOutputPlace();
-                RealToken token = RealToken(0.0, output->getWeight());
+                RealToken token = RealToken(0, output->getWeight());
                 child->addTokenInPlace(place, token);
                 int place_i = place.getIndex();
                 if(child->numberOfTokensInPlace(place_i) > _currentPlacesStatistics[place_i]) {
