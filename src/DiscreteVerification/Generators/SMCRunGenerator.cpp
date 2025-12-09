@@ -57,7 +57,7 @@ namespace VerifyTAPN {
                 auto* intervals = &_transitionIntervals[i];
                 if(!intervals->empty() && intervals->front().lower() == 0) {
                     const Distribution& distrib = _tapn.getTransitions()[i]->getDistribution();
-                    _dates_sampled[i] = distrib.sample(_rng, _numericPrecision);
+                    _dates_sampled[i] = toClock(distrib.sample(_rng), _numericPrecision);
                 }
                 deadlocked &=   _transitionIntervals[i].empty() || 
                                 (
@@ -104,7 +104,7 @@ namespace VerifyTAPN {
                     _dates_sampled[i] = std::numeric_limits<clockValue>::max();
                 } else if(newlyEnabled) {
                     const Distribution& distrib = _tapn.getTransitions()[i]->getDistribution();
-                    clockValue date = distrib.sample(_rng, _numericPrecision);
+                    clockValue date = toClock(distrib.sample(_rng), _numericPrecision);
                     if(_transitionIntervals[i].front().upper() > 0 || date == 0) {
                         _dates_sampled[i] = date;
                     }
@@ -132,6 +132,8 @@ namespace VerifyTAPN {
 
         RealMarking* SMCRunGenerator::next() {
             auto [transi, delay] = getWinnerTransitionAndDelay();
+
+            //std::cout << transi->getName() << " : " << delay << std::endl;
             
             if(delay == std::numeric_limits<clockValue>::max()) {
                 _maximal = true;
