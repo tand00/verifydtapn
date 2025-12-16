@@ -66,6 +66,24 @@ namespace VerifyTAPN {
                     }
                 }
 
+                void delta_neg(T dx) {
+                    if(empty()) return;
+                    if(low != boundDown()) {
+                        if(boundDown() + low < dx) {
+                            low = boundDown();
+                        } else {
+                            low -= dx;
+                        }
+                    }
+                    if(high != boundUp()) {
+                        if(boundDown() + high < dx) {
+                            high = boundDown();
+                        } else {
+                            high -= dx;
+                        }
+                    }
+                }
+
                 interval positive() {
                     if(empty() || high < 0) return interval((T) 1,0);
                     return interval(std::max(low, (T) 0), high);

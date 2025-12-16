@@ -13,6 +13,8 @@ namespace VerifyTAPN::DiscreteVerification::Util {
 
     clockValue toClock(double value, const uint32_t precision);
 
+    clockValue toClock(int value, const uint32_t precision);
+
 }
 
 #endif

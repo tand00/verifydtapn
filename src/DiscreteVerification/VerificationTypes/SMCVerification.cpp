@@ -83,9 +83,8 @@ bool SMCVerification::run() {
     clockValue timeBound = toClock(smcSettings.timeBound, options.getSMCNumericPrecision());
     while(mustDoAnotherRun()) {
         bool runRes = executeRun();
-        double runDuration = std::min(runGenerator.getRunDelay(), timeBound);
+        double runDuration = clockToDouble(std::min(runGenerator.getRunDelay(), timeBound), options.getSMCNumericPrecision());
         int runSteps = std::min(runGenerator.getRunSteps(), smcSettings.stepBound);
-        std::cout << runSteps << std::endl; 
         handleRunResult(runRes, runSteps, runDuration);
         if(mustSaveTrace()) handleTrace(runRes);
         runGenerator.recordTrace = mustSaveTrace();

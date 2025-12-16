@@ -19,7 +19,7 @@ namespace VerifyTAPN::DiscreteVerification {
 
         public:
 
-            RealToken(clockValue value, int count) : age(age), count(count) { }
+            RealToken(clockValue value, int count) : age(value), count(count) { }
             RealToken(const RealToken&) = default;
             RealToken(const Token& t) : count(t.getCount()) {
                 age = t.getAge();
@@ -106,11 +106,14 @@ namespace VerifyTAPN::DiscreteVerification {
 
             bool remove(RealToken to_remove);
 
-            clockValue availableDelay(const uint32_t precision = 0) const {
+            clockValue availableDelay(const uint32_t precision) const {
                 if(tokens.size() == 0) return std::numeric_limits<clockValue>::max();
-                clockValue delay = 
-                    toClock(place->getInvariant().getBound(), precision) - maxTokenAge();
-                return delay <= 0 ? 0 : delay;
+                clockValue bound = toClock(place->getInvariant().getBound(), precision);
+                clockValue maxAge = maxTokenAge();
+                if(bound < maxAge) {
+                    return 0;
+                }
+                return bound - maxAge;
             }
 
             inline int placeId() const {
@@ -161,7 +164,7 @@ namespace VerifyTAPN::DiscreteVerification {
 
             void addTokenInPlace(const TAPN::TimedPlace &place, RealToken &token);
 
-            clockValue availableDelay() const;
+            clockValue availableDelay(const uint32_t precision) const;
 
             void setDeadlocked(const bool dead);
 
@@ -175,7 +178,7 @@ namespace VerifyTAPN::DiscreteVerification {
 
             inline void setPreviousDelay(const clockValue delay) { this->fromDelay = delay; }
 
-            bool enables(TAPN::TimedTransition* transition, const uint32_t precision = 0);
+            bool enables(TAPN::TimedTransition* transition, const uint32_t precision);
 
             unsigned int _thread_id = 0;
 

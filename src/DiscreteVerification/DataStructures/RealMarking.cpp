@@ -136,12 +136,12 @@ void RealMarking::addTokenInPlace(const TAPN::TimedPlace &place, RealToken &toke
     places[place.getIndex()].add(token);
 }
 
-clockValue RealMarking::availableDelay() const
+clockValue RealMarking::availableDelay(const uint32_t precision) const
 {
     clockValue available = std::numeric_limits<clockValue>::max();
     for(const auto& place : places) {
         if(place.isEmpty()) continue;
-        clockValue delay = place.availableDelay();
+        clockValue delay = place.availableDelay(precision);
         if(delay < available) {
             available = delay;
         }

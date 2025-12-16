@@ -10,13 +10,16 @@ using VerifyTAPN::TAPN::TimedArcPetriNet;
 
 double clockToDouble(clockValue value, const uint32_t precision)
 {
+    if(value == std::numeric_limits<clockValue>::max()) {
+        return std::numeric_limits<double>::infinity();
+    }
     double time = static_cast<double>(value);
     if(precision > 0) {
         time /= pow(10.0, precision);
     } else {
         time /= pow(10.0, MAX_PRECISION);
     }
-    return 0.0;
+    return time;
 }
 
 clockValue toClock(double value, const uint32_t precision)
@@ -30,6 +33,20 @@ clockValue toClock(double value, const uint32_t precision)
         value *= pow(10.0, MAX_PRECISION);
     }
     return static_cast<clockValue>(value);
+}
+
+clockValue toClock(int value, const uint32_t precision)
+{
+    if(value == std::numeric_limits<int>::max()) {
+        return std::numeric_limits<clockValue>::max();
+    }
+    clockValue res = value;
+    if(precision > 0) {
+        res *= pow(10, precision);
+    } else {
+        res *= pow(10, MAX_PRECISION);
+    }
+    return res;
 }
 
 }

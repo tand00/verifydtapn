@@ -24,7 +24,7 @@ namespace VerifyTAPN {
 
         public:
 
-            SMCRunGenerator(TAPN::TimedArcPetriNet &tapn, const unsigned int numericPrecision = 0)
+            SMCRunGenerator(TAPN::TimedArcPetriNet &tapn, const unsigned int numericPrecision)
             : _tapn(tapn)
             , _defaultTransitionIntervals(tapn.getTransitions().size()) 
             , _transitionsStatistics(tapn.getTransitions().size(), 0)
