@@ -132,8 +132,6 @@ namespace VerifyTAPN {
 
         RealMarking* SMCRunGenerator::next() {
             auto [transi, delay] = getWinnerTransitionAndDelay();
-
-            std::cout << "DELAY: " << delay << std::endl;
             
             if(delay == std::numeric_limits<clockValue>::max()) {
                 _maximal = true;
@@ -145,16 +143,15 @@ namespace VerifyTAPN {
                 _trace.push_back(_parent);
             }
 
-            std::cout << "Marking ---------------" << std::endl;
-            for(auto& place : _parent->getPlaceList()) {
-                if(place.numberOfTokens() == 0) continue;
-                std::cout << "place " << place.placeId() << " ";
-                for(auto& tok : place.tokens) {
-                    std::cout << tok.getAge() << ", ";
-                }
-                std::cout << std::endl;
-            }
-            std::cout << "----------------------" << std::endl;
+            // std::cout << "Marking ---------------" << std::endl;
+            // for(auto& place : _parent->getPlaceList()) {
+            //     if(place.numberOfTokens() == 0) continue;
+            //     std::cout << "place " << place.placeId() << " ";
+            //     for(auto& tok : place.tokens) {
+            //         std::cout << tok.getAge() << ", ";
+            //     }
+            //     std::cout << std::endl;
+            // }
 
             _parent->deltaAge(delay);
 
@@ -306,7 +303,6 @@ namespace VerifyTAPN {
                         for(auto age : selected) {
                             interval<clockValue> shifted = arcInterval;
                             shifted.delta_neg(age);
-                            std::cout << shifted.lower() << "," << shifted.upper() << std::endl;
                             tokenSetInterval = Util::intersect(tokenSetInterval, shifted);
                         }
                         Util::setAdd(firingDates, tokenSetInterval);
@@ -324,16 +320,11 @@ namespace VerifyTAPN {
             size_t tested = 0;
             clockValue lower = toClock(interval.getLowerBound(), _numericPrecision);
             clockValue upper = toClock(interval.getUpperBound(), _numericPrecision);
-            std::cout << "Need to find " << remaining << std::endl;
-            std::cout << "In: " << lower << " , " << upper << std::endl;
-            std::cout << "prev: " << interval.getLowerBound() << " , " << interval.getUpperBound() << std::endl;
             while(remaining > 0 && tested < tokenList.size()) {
                 RealToken& token = tokenList[tok_index];
                 clockValue age = token.getAge();
-                std::cout << "- Age: " << age << std::endl;
                 if(lower <= age && upper >= age) {
                     res.push_back(RealToken(age, 1));
-                    std::cout << "Found token of age " << age << std::endl;
                     remaining--;
                     tokenList[tok_index].remove(1);
                     if(tokenList[tok_index].getCount() == 0) {
@@ -422,7 +413,6 @@ namespace VerifyTAPN {
             for (auto &input : transi->getPreset()) {
                 RealPlace& place = placelist[input->getInputPlace().getIndex()];
                 RealTokenList& tokenList = place.tokens;
-                std::cout << "Firing frome place " << place.placeId() << "-----------" << std::endl;
                 switch(transi->getFiringMode()) {
                     case SMC::Random:
                         removeRandom(tokenList, input->getInterval(), input->getWeight());
