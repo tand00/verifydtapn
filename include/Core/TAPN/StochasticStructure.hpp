@@ -4,6 +4,7 @@
 #include <random>
 #include <sstream>
 #include <string>
+#include <vector>
 
 namespace VerifyTAPN::SMC {
 
@@ -66,8 +67,8 @@ namespace VerifyTAPN::SMC {
         double logStddev;
     };
     struct SMCCustomParameters {
-        std::vector<double> values;
-        size_t index = 0;
+        double* values;
+        int len;
     };
 
     union DistributionParameters {
@@ -123,8 +124,8 @@ namespace VerifyTAPN::SMC {
                     date = std::lognormal_distribution(parameters.logNormal.logMean, parameters.logNormal.logStddev)(engine);
                     break;
                 case Custom:
-                    date = parameters.custom.values[parameters.custom.index];
-                    parameters.custom.index = (parameters.custom.index + 1) % parameters.custom.values.size();
+                    int index = std::uniform_int_distribution(parameters.custom.len)(engine);
+                    date = parameters.custom.values[index];
                     break;
             }
             return std::max(date, 0.0);
