@@ -101,6 +101,7 @@ namespace VerifyTAPN {
             clockValue _lastDelay = 0;
             clockValue _totalTime = 0;
             int _totalSteps = 0;
+            int _sample_index = 0;
 
             uint32_t _numericPrecision = 0;
 

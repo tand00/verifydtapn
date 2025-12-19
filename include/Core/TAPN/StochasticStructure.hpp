@@ -89,7 +89,7 @@ namespace VerifyTAPN::SMC {
         DistributionParameters parameters;
 
         template<typename T>
-        double sample(T& engine) const {
+        double sample(T& engine, int& index) const {
             double date = 0;
             switch(type) {
                 case Constant:
@@ -124,8 +124,8 @@ namespace VerifyTAPN::SMC {
                     date = std::lognormal_distribution(parameters.logNormal.logMean, parameters.logNormal.logStddev)(engine);
                     break;
                 case Custom:
-                    int index = std::uniform_int_distribution(parameters.custom.len)(engine);
                     date = parameters.custom.values[index];
+                    index = (index + 1) % parameters.custom.len;
                     break;
             }
             return std::max(date, 0.0);

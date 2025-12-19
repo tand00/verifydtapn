@@ -51,13 +51,14 @@ namespace VerifyTAPN {
             _maximal = false;
             _totalTime = 0;
             _totalSteps = 0;
+            _sample_index = 0;
             _dates_sampled = std::vector<clockValue>(_transitionIntervals.size(), std::numeric_limits<clockValue>::max());
             bool deadlocked = true;
             for(int i = 0 ; i < _dates_sampled.size() ; i++) {
                 auto* intervals = &_transitionIntervals[i];
                 if(!intervals->empty() && intervals->front().lower() == 0) {
                     const Distribution& distrib = _tapn.getTransitions()[i]->getDistribution();
-                    _dates_sampled[i] = toClock(distrib.sample(_rng), _numericPrecision);
+                    _dates_sampled[i] = toClock(distrib.sample(_rng, _sample_index), _numericPrecision);
                 }
                 deadlocked &=   _transitionIntervals[i].empty() || 
                                 (
@@ -104,7 +105,7 @@ namespace VerifyTAPN {
                     _dates_sampled[i] = std::numeric_limits<clockValue>::max();
                 } else if(newlyEnabled) {
                     const Distribution& distrib = _tapn.getTransitions()[i]->getDistribution();
-                    clockValue date = toClock(distrib.sample(_rng), _numericPrecision);
+                    clockValue date = toClock(distrib.sample(_rng, _sample_index), _numericPrecision);
                     if(_transitionIntervals[i].front().upper() > 0 || date == 0) {
                         _dates_sampled[i] = date;
                     }
