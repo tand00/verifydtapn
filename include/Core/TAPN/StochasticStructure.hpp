@@ -25,7 +25,8 @@ namespace VerifyTAPN::SMC {
         DiscreteUniform,
         Geometric,
         Triangular,
-        LogNormal
+        LogNormal,
+        Custom
     };
 
     std::string distributionName(DistributionType type);
@@ -64,6 +65,10 @@ namespace VerifyTAPN::SMC {
         double logMean;
         double logStddev;
     };
+    struct SMCCustomParameters {
+        std::vector<double> values;
+        size_t index = 0;
+    };
 
     union DistributionParameters {
         SMCUniformParameters uniform;
@@ -75,6 +80,7 @@ namespace VerifyTAPN::SMC {
         SMCGeometricParameters geometric;
         SMCTriangularParameters triangular;
         SMCLogNormalParameters logNormal;
+        SMCCustomParameters custom;
     };
 
     struct Distribution {
@@ -115,6 +121,10 @@ namespace VerifyTAPN::SMC {
                     break;
                 case LogNormal: 
                     date = std::lognormal_distribution(parameters.logNormal.logMean, parameters.logNormal.logStddev)(engine);
+                    break;
+                case Custom:
+                    date = parameters.custom.values[parameters.custom.index];
+                    parameters.custom.index = (parameters.custom.index + 1) % parameters.custom.values.size();
                     break;
             }
             return std::max(date, 0.0);

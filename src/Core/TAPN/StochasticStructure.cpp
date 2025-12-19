@@ -89,6 +89,10 @@ namespace VerifyTAPN::SMC {
                 params.logNormal.logMean = raw_params[0];
                 params.logNormal.logStddev = raw_params[1];
                 break;
+            case Custom:
+                params.custom.index = 0;
+                params.custom.values = raw_params;
+                break;
             default:
                 break;
         }
